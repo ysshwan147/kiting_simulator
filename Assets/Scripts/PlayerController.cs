@@ -1,36 +1,86 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
 {
-    private Vector3 targetPosition;
-    private bool isMoving = false;
+    private NavMeshAgent navMeshAgent;
+    
+    // [HideInInspector] public SuperCharacterController superCharacterController;
+    // [HideInInspector] public PlayerMovementController playerMovementController;
+    [HideInInspector] public Animator animator;
 
-    [SerializeField] private float moveSpeed = 1.0f;
+
+    private void Start()
+    {
+        // NavMeshAgent 컴포넌트를 가져옵니다.
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        // 회전을 NavMeshAgent에서 제어하도록 설정합니다.
+        navMeshAgent.updateRotation = false;
+
+
+        // Setup Animator, add AnimationEvents script.
+        animator = GetComponentInChildren<Animator>();
+        if (animator == null) {
+            Debug.LogError("ERROR: There is no Animator component for character.");
+            Debug.Break();
+        } 
+        // else {
+        //     animator.gameObject.AddComponent<WarriorCharacterAnimatorEvents>();
+        //     animator.GetComponent<WarriorCharacterAnimatorEvents>().warriorController = this;
+        //     animator.gameObject.AddComponent<AnimatorParentMove>();
+        //     animator.GetComponent<AnimatorParentMove>().animator = animator;
+        //     animator.GetComponent<AnimatorParentMove>().warriorController = this;
+        //     animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
+        //     animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+        // }
+
+
+        animator.SetFloat("Animation Speed", 1);
+    }
 
     private void Update()
     {
-        // 마우스 왼쪽 버튼을 클릭하면 플레이어를 움직일 목표 위치를 설정합니다.
+        // 마우스 우클릭을 감지합니다.
         if (Input.GetMouseButtonDown(1))
         {
-            // 마우스 클릭 위치를 월드 좌표로 변환합니다.
-            targetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            targetPosition.y = 0f;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-            // 플레이어가 움직이도록 플래그를 설정합니다.
-            isMoving = true;
-        }
-
-        // 플레이어를 목표 위치로 움직입니다.
-        if (isMoving)
-        {
-            // 플레이어를 목표 위치로 부드럽게 이동시킵니다.
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * moveSpeed);
-
-            // 목표 위치에 도달하면 움직임을 멈춥니다.
-            if (transform.position == targetPosition)
+            // Ray를 쏘아 맞은 지점을 확인합니다.
+            if (Physics.Raycast(ray, out hit))
             {
-                isMoving = false;
+                // NavMesh에서 유효한 위치를 찾아 플레이어의 목표 위치로 설정합니다.
+                if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, 1.0f, NavMesh.AllAreas))
+                {
+                    navMeshAgent.destination = navHit.position;
+
+                    // 플레이어의 방향을 즉시 변경합니다.
+                    transform.LookAt(navHit.position);
+
+                    animator.SetBool("Moving", true);
+                    animator.SetFloat("Velocity", 100);
+                }
             }
         }
+        else if (!navMeshAgent.isStopped)
+        {
+            // 이동 중인 경우 (NavMeshAgent가 동작 중)
+            // Idle 상태로 전환할 필요 없음
+
+            // 이동 중 애니메이션 활성화
+            animator.SetBool("Moving", true);
+            animator.SetFloat("Velocity", 100);
+        }
+        else //if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        {
+            // 이동 중이 아닌 경우 정지 애니메이션 활성화
+            animator.SetBool("Moving", false);
+            animator.SetFloat("Velocity", 0);
+        }
+        // else
+        // {
+        //     animator.SetBool("Moving", true);
+        //     animator.SetFloat("Velocity", 100);
+        // }
     }
 }
