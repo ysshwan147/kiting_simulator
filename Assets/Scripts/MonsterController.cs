@@ -7,6 +7,8 @@ public class MonsterController : MonoBehaviour
     public float detectionRange = 10f; // 몬스터의 감지 범위
     public float attackRange = 2f; // 몬스터의 공격 사거리
     public float attackDelay = 2f; // 공격 딜레이 시간
+    public float attackAnimationSpeed = 0.3f;
+    public float movingAnimationSpeed = 1.0f;
 
     private Transform player;
     private NavMeshAgent navMeshAgent;
@@ -14,7 +16,8 @@ public class MonsterController : MonoBehaviour
     private float nextAttackTime;
 
     private float delayTime;
-    private bool canMove = false;
+
+    private MonsterAttack monsterAttack;
 
     private enum MonsterState
     {
@@ -39,9 +42,11 @@ public class MonsterController : MonoBehaviour
             Debug.Break();
         } 
 
-        animator.SetFloat("Animation Speed", 1);
+        animator.SetFloat("Animation Speed", movingAnimationSpeed);
         animator.SetInteger("Action", 1);
         animator.SetInteger("Trigger Number", 2);
+
+        monsterAttack = GetComponent<MonsterAttack>();
     }
 
     private void Update()
@@ -56,12 +61,10 @@ public class MonsterController : MonoBehaviour
                 // 플레이어가 감지 범위 안에 들어오면 이동 상태로 전환
                 if (distanceToPlayer <= detectionRange)
                 {
-                    canMove = true;
                     currentState = MonsterState.Moving;
                     navMeshAgent.SetDestination(player.position);
-                    animator.SetFloat("Animation Speed", 1);
-                    animator.SetBool("Moving", true);
-                    animator.SetFloat("Velocity", 10);
+                    animator.SetFloat("Animation Speed", movingAnimationSpeed);
+                    movingAnimation(true, 10);
                 }
                 break;
 
@@ -71,11 +74,9 @@ public class MonsterController : MonoBehaviour
                 {
                     currentState = MonsterState.AttackReady;
                     navMeshAgent.isStopped = true; // 이동 중지
-                    animator.SetBool("Moving", false);
-                    animator.SetFloat("Velocity", 0);
+                    movingAnimation(false, 0);
 
-                    canMove = false;
-                    animator.SetFloat("Animation Speed", 0.3f);
+                    animator.SetFloat("Animation Speed", attackAnimationSpeed);
                     animator.SetTrigger("Trigger");
                     
                 }
@@ -87,8 +88,7 @@ public class MonsterController : MonoBehaviour
                 {
                     // 플레이어가 감지 범위를 벗어나면 다시 Idle 상태로 전환
                     currentState = MonsterState.Idle;
-                    animator.SetBool("Moving", false);
-                    animator.SetFloat("Velocity", 0);
+                    movingAnimation(false, 0);
                 }
                 break;
 
@@ -100,18 +100,6 @@ public class MonsterController : MonoBehaviour
                     
                     delayTime = 0.0f;
                 }
-                // else if (distanceToPlayer > attackRange)
-                // {
-                //     // 플레이어가 공격 사거리를 벗어나면 다시 이동 상태로 전환
-                //     currentState = MonsterState.Moving;
-                //     navMeshAgent.SetDestination(player.position);
-                //     navMeshAgent.isStopped = false;
-                //     animator.SetFloat("Animation Speed", 1);
-                //     animator.SetBool("Moving", true);
-                //     animator.SetFloat("Velocity", 10);
-
-                //     delayTime = 0.0f;
-                // }
 
                 delayTime += deltaTime;
                 break;
@@ -123,19 +111,24 @@ public class MonsterController : MonoBehaviour
                     Debug.Log("Miss!");
                 } else {
                     Debug.Log("Attack!");
+
+                    monsterAttack.attack();
                 }
 
                 // 공격이 끝나면 이동 상태로 전환
-                canMove = true;
                 currentState = MonsterState.Moving;
                 navMeshAgent.SetDestination(player.position);
                 navMeshAgent.isStopped = false;
-                animator.SetFloat("Animation Speed", 1);
-                animator.SetBool("Moving", true);
-                animator.SetFloat("Velocity", 10);
+                animator.SetFloat("Animation Speed", movingAnimationSpeed);
+                movingAnimation(true, 10);
                 break;
         }
 
         
+    }
+
+    private void movingAnimation(bool flag, float velocity) {
+        animator.SetBool("Moving", flag);
+        animator.SetFloat("Velocity", velocity);
     }
 }
