@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Collide
+  - Ground
+  - Monster
+  - User
   layers:
   - Default
   - TransparentFX

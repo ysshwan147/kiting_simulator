@@ -1,14 +1,23 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Controller
 {
+    public float attackAnimationSpeed = 0.3f;
+    public float movingAnimationSpeed = 1.0f;
+
     private NavMeshAgent navMeshAgent;
-    
-    // [HideInInspector] public SuperCharacterController superCharacterController;
-    // [HideInInspector] public PlayerMovementController playerMovementController;
+
     [HideInInspector] public Animator animator;
 
+    private enum PlayerState
+    {
+        Idle,
+        Attacking,
+        Moving
+    }
+
+    private PlayerState currentState;
 
     private void Start()
     {
@@ -24,65 +33,92 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("ERROR: There is no Animator component for character.");
             Debug.Break();
         } 
-        // else {
-        //     animator.gameObject.AddComponent<WarriorCharacterAnimatorEvents>();
-        //     animator.GetComponent<WarriorCharacterAnimatorEvents>().warriorController = this;
-        //     animator.gameObject.AddComponent<AnimatorParentMove>();
-        //     animator.GetComponent<AnimatorParentMove>().animator = animator;
-        //     animator.GetComponent<AnimatorParentMove>().warriorController = this;
-        //     animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
-        //     animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
-        // }
 
-
-        animator.SetFloat("Animation Speed", 1);
+        currentState = PlayerState.Idle;
     }
 
     private void Update()
     {
-        // 마우스 우클릭을 감지합니다.
-        if (Input.GetMouseButtonDown(1))
+
+        // 좌클릭을 감지하면 몬스터를 공격 상태로 전환
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            // Ray를 쏘아 맞은 지점을 확인합니다.
             if (Physics.Raycast(ray, out hit))
             {
-                // NavMesh에서 유효한 위치를 찾아 플레이어의 목표 위치로 설정합니다.
-                if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, 1.0f, NavMesh.AllAreas))
+                if (hit.collider.CompareTag("Monster"))
                 {
-                    navMeshAgent.destination = navHit.position;
+                    currentState = PlayerState.Attacking;
 
-                    // 플레이어의 방향을 즉시 변경합니다.
-                    transform.LookAt(navHit.position);
+                    transform.LookAt(hit.point);
+                }
+                else if (hit.collider.CompareTag("Ground"))
+                {
+                    currentState = PlayerState.Moving;
 
-                    animator.SetBool("Moving", true);
-                    animator.SetFloat("Velocity", 10);
+                    if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, 1.0f, NavMesh.AllAreas))
+                    {
+                        navMeshAgent.destination = navHit.position;
+
+                        // 플레이어의 방향을 즉시 변경합니다.
+                        transform.LookAt(navHit.position);
+                    }
                 }
             }
         }
-        // else if (!navMeshAgent.isStopped)
-        // {
-        //     // 이동 중인 경우 (NavMeshAgent가 동작 중)
-        //     // Idle 상태로 전환할 필요 없음
 
-        //     // 이동 중 애니메이션 활성화
-        //     animator.SetBool("Moving", true);
-        //     animator.SetFloat("Velocity", 100);
-        // }
-        if (navMeshAgent.velocity.magnitude < 0.1f)
+        if (navMeshAgent.isStopped)
         {
-            // 이동 중이 아닌 경우 정지 애니메이션 활성화
-            animator.SetBool("Moving", false);
-            animator.SetFloat("Velocity", 0);
-        }
-        else
-        {
-            animator.SetBool("Moving", true);
-            animator.SetFloat("Velocity", 10);
+            currentState = PlayerState.Idle;
         }
 
-        animator.SetFloat("Animation Speed", 1);
+        // 상태에 따라 애니메이션 및 동작을 처리
+        switch (currentState)
+        {
+            case PlayerState.Idle:
+                // Idle 상태 처리
+                setIdleAnimation();
+                break;
+
+            case PlayerState.Attacking:
+                // 공격 상태 처리 (공격 애니메이션 재생 등)
+
+                setAttackAnimation();
+                if (hitting)
+                {
+                    Debug.Log("Player Attack!");
+                    
+                }
+                break;
+
+            case PlayerState.Moving:
+                // 이동 상태 처리 (이동 명령 실행 등)
+                
+                setMovingAnimation();
+                break;
+        }
+    }
+
+    private void setMovingAnimation() {
+        animator.SetFloat("Animation Speed", movingAnimationSpeed);
+        animator.SetTrigger("Moving");
+        animator.SetFloat("Velocity", 10);
+    }
+
+
+    private void setIdleAnimation()
+    {
+        animator.SetFloat("Animation Speed", movingAnimationSpeed);
+        animator.SetTrigger("Idle");
+        animator.SetFloat("Velocity", 0);
+    }
+
+
+    private void setAttackAnimation()
+    {
+        animator.SetFloat("Animation Speed", attackAnimationSpeed);
+        animator.SetTrigger("Attack");
     }
 }
