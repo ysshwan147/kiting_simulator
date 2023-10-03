@@ -377,8 +377,8 @@
 "Assets/ExplosiveLLC/Warrior FREE/Code/WarriorInputSystemController.cs"
 "Assets/ExplosiveLLC/Warrior FREE/Code/WarriorMovementController.cs"
 "Assets/ExplosiveLLC/Warrior FREE/Code/WarriorTiming.cs"
+"Assets/Scripts/MonsterController.cs"
 "Assets/Scripts/PlayerController.cs"
-"Assets/Scripts/PlayerMovementController.cs"
 -langversion:9.0
 
 /deterministic

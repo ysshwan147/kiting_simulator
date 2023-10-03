@@ -58,29 +58,31 @@ public class PlayerController : MonoBehaviour
                     transform.LookAt(navHit.position);
 
                     animator.SetBool("Moving", true);
-                    animator.SetFloat("Velocity", 100);
+                    animator.SetFloat("Velocity", 10);
                 }
             }
         }
-        else if (!navMeshAgent.isStopped)
-        {
-            // 이동 중인 경우 (NavMeshAgent가 동작 중)
-            // Idle 상태로 전환할 필요 없음
+        // else if (!navMeshAgent.isStopped)
+        // {
+        //     // 이동 중인 경우 (NavMeshAgent가 동작 중)
+        //     // Idle 상태로 전환할 필요 없음
 
-            // 이동 중 애니메이션 활성화
-            animator.SetBool("Moving", true);
-            animator.SetFloat("Velocity", 100);
-        }
-        else //if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        //     // 이동 중 애니메이션 활성화
+        //     animator.SetBool("Moving", true);
+        //     animator.SetFloat("Velocity", 100);
+        // }
+        if (navMeshAgent.velocity.magnitude < 0.1f)
         {
             // 이동 중이 아닌 경우 정지 애니메이션 활성화
             animator.SetBool("Moving", false);
             animator.SetFloat("Velocity", 0);
         }
-        // else
-        // {
-        //     animator.SetBool("Moving", true);
-        //     animator.SetFloat("Velocity", 100);
-        // }
+        else
+        {
+            animator.SetBool("Moving", true);
+            animator.SetFloat("Velocity", 10);
+        }
+
+        animator.SetFloat("Animation Speed", 1);
     }
 }
