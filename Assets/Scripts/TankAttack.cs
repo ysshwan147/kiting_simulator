@@ -15,6 +15,6 @@ public class TankAttack : MonsterAttack
     }
 
     public override void attack() {
-        Debug.Log("tank attack");
+        // Debug.Log("tank attack");
     }
 }

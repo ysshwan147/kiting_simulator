@@ -379,6 +379,8 @@
 "Assets/ExplosiveLLC/Warrior FREE/Code/WarriorTiming.cs"
 "Assets/Scripts/AnimationEventController.cs"
 "Assets/Scripts/Attack.cs"
+"Assets/Scripts/Ball.cs"
+"Assets/Scripts/BallHit.cs"
 "Assets/Scripts/Controller.cs"
 "Assets/Scripts/MageAttack.cs"
 "Assets/Scripts/MonsterAttack.cs"

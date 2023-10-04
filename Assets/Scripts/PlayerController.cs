@@ -9,6 +9,7 @@ public class PlayerController : Controller
     private NavMeshAgent navMeshAgent;
 
     [HideInInspector] public Animator animator;
+    [HideInInspector] public Attack attackScript;
 
     private enum PlayerState
     {
@@ -34,7 +35,11 @@ public class PlayerController : Controller
             Debug.Break();
         } 
 
+        attackScript = GetComponent<Attack>();
+
         currentState = PlayerState.Idle;
+
+        animating = true;
     }
 
     private void Update()
@@ -60,13 +65,22 @@ public class PlayerController : Controller
 
                     if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, 1.0f, NavMesh.AllAreas))
                     {
-                        navMeshAgent.destination = navHit.position;
+                        // navMeshAgent.destination = navHit.position;
+
+                        navMeshAgent.SetDestination(navHit.position);
+                        navMeshAgent.isStopped = false;
 
                         // 플레이어의 방향을 즉시 변경합니다.
                         transform.LookAt(navHit.position);
                     }
                 }
             }
+        }
+
+        if (!animating)
+        {
+            currentState = PlayerState.Idle;
+            animating = true;
         }
 
         if (navMeshAgent.isStopped)
@@ -78,22 +92,28 @@ public class PlayerController : Controller
         switch (currentState)
         {
             case PlayerState.Idle:
+                // Debug.Log("idle");
                 // Idle 상태 처리
                 setIdleAnimation();
                 break;
 
             case PlayerState.Attacking:
+                // Debug.Log("attack");
                 // 공격 상태 처리 (공격 애니메이션 재생 등)
 
                 setAttackAnimation();
+                
                 if (hitting)
                 {
-                    Debug.Log("Player Attack!");
-                    
+                    hitting = false;
+                    // Debug.Log("Player Attack!");
+                    attackScript.attack();
                 }
+                
                 break;
 
             case PlayerState.Moving:
+                // Debug.Log("move");
                 // 이동 상태 처리 (이동 명령 실행 등)
                 
                 setMovingAnimation();

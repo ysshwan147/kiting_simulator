@@ -15,6 +15,6 @@ public class MageAttack : MonsterAttack
     }
 
     public override void attack() {
-        Debug.Log("mage attack");
+        // Debug.Log("mage attack");
     }
 }

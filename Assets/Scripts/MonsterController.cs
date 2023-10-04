@@ -13,7 +13,7 @@ public class MonsterController : Controller
     private NavMeshAgent navMeshAgent;
     private Animator animator;
 
-    private MonsterAttack monsterAttack;
+    [HideInInspector] public Attack attackScript;
     private MonsterState currentState;
 
     private enum MonsterState
@@ -38,7 +38,7 @@ public class MonsterController : Controller
             Debug.Break();
         } 
 
-        monsterAttack = GetComponent<MonsterAttack>();
+        attackScript = GetComponent<Attack>();
     }
 
     private void Update()
@@ -92,8 +92,9 @@ public class MonsterController : Controller
                 // 이 부분은 몬스터의 공격 로직에 따라 구현되어야 합니다.
                 if (hitting)
                 {
-                    Debug.Log("Attack!");
-                    monsterAttack.attack();
+                    hitting = false;
+                    // Debug.Log("Attack!");
+                    attackScript.attack();
                 }
                 transform.LookAt(targetPosition);
                 setAttackAnimation();

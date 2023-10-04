@@ -9,9 +9,7 @@ public class AnimationEventController : MonoBehaviour
     }
 
     public void End()
-    {
-        Debug.Log("end");
-        
+    {        
         controller.setAnimating(false);
     }
 
