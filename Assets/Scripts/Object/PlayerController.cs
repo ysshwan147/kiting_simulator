@@ -5,6 +5,7 @@ public class PlayerController : Controller
 {
     public float attackAnimationSpeed = 0.3f;
     public float movingAnimationSpeed = 1.0f;
+    public Vector3 startingPosition;
 
     private NavMeshAgent navMeshAgent;
 
@@ -40,6 +41,8 @@ public class PlayerController : Controller
         currentState = PlayerState.Idle;
 
         animating = true;
+
+        transform.position = startingPosition;
     }
 
     private void Update()

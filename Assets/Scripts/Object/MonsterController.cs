@@ -8,6 +8,7 @@ public class MonsterController : Controller
     public float attackRange = 2f; // 몬스터의 공격 사거리
     public float attackAnimationSpeed = 0.3f;
     public float movingAnimationSpeed = 1.0f;
+    public Vector3 startingPosition;
 
     private Transform player;
     private NavMeshAgent navMeshAgent;
@@ -39,6 +40,8 @@ public class MonsterController : Controller
         } 
 
         attackScript = GetComponent<Attack>();
+
+        transform.position = startingPosition;
     }
 
     private void Update()
