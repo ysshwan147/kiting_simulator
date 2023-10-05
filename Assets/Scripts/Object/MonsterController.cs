@@ -87,6 +87,7 @@ public class MonsterController : Controller
                 setIdleAnimation();
                 currentState = MonsterState.Attacking;
                 animating = true;
+                transform.LookAt(targetPosition);
                 break;
             }
             case MonsterState.Attacking:
@@ -99,7 +100,7 @@ public class MonsterController : Controller
                     // Debug.Log("Attack!");
                     attackScript.attack();
                 }
-                transform.LookAt(targetPosition);
+                
                 setAttackAnimation();
 
                 

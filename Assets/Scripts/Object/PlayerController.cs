@@ -86,10 +86,6 @@ public class PlayerController : Controller
             animating = true;
         }
 
-        if (navMeshAgent.isStopped)
-        {
-            currentState = PlayerState.Idle;
-        }
 
         // 상태에 따라 애니메이션 및 동작을 처리
         switch (currentState)
@@ -103,7 +99,7 @@ public class PlayerController : Controller
             case PlayerState.Attacking:
                 // Debug.Log("attack");
                 // 공격 상태 처리 (공격 애니메이션 재생 등)
-
+                navMeshAgent.isStopped = true;
                 setAttackAnimation();
                 
                 if (hitting)

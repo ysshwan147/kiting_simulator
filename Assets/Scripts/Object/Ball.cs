@@ -29,13 +29,15 @@ public class Ball : MonoBehaviour
         // 충돌한 오브젝트의 태그를 확인합니다.
         if (other.CompareTag(targetTag))
         {
-            // 상대 오브젝트의 BallHit 스크립트를 가져옵니다.
-            BallHit ballHitScript = other.GetComponent<BallHit>();
+            if (targetTag == "User") {
+                // 상대 오브젝트의 BallHit 스크립트를 가져옵니다.
+                BallHit ballHitScript = other.GetComponent<BallHit>();
 
-            if (ballHitScript != null)
-            {
-                // BallHit 스크립트의 ballHit() 메서드를 호출합니다.
-                ballHitScript.ballHit();
+                if (ballHitScript != null)
+                {
+                    // BallHit 스크립트의 ballHit() 메서드를 호출합니다.
+                    ballHitScript.ballHit();
+                }
             }
 
             // 충돌한 오브젝트를 파괴합니다.
