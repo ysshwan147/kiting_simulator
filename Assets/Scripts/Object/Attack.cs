@@ -9,6 +9,13 @@ public class Attack : MonoBehaviour
     public string targetTag;
     private Vector3 ballDirection;
 
+    private AudioSource audioSource;
+    public AudioClip attackSound;
+
+    private void Start() {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     public void attack()
     {
         // 공 오브젝트 생성
@@ -17,6 +24,9 @@ public class Attack : MonoBehaviour
         ball.transform.position = Shoot.transform.position;
         // Ball 스크립트를 가져옴
         Ball ballScript = ball.GetComponent<Ball>();
+
+        audioSource.clip = attackSound;
+        audioSource.Play();
 
         if (ballScript != null)
         {
